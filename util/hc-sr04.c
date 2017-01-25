@@ -1,18 +1,31 @@
-/*
- *  hc-sr04.c:
- *	Simple test program to test the wiringPi functions
- */
-
-#include <wiringPi.h>
+#define BEEP 27
+#define TRIG_X 1
+#define ECHO_X 3
+#define TRIG_Y 0
+#define ECHO_Y 2
+#define TRIG_Z 4
+#define ECHO_Z 5
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <wiringPi.h>
 
-int TRIG, ECHO;
 
-static int ping()
-{
+int buzzer() {
+	pinMode(BEEP, OUTPUT);
+	int timer = 200;
+	while(timer != 0) {
+      		digitalWrite(BEEP, HIGH);
+      		delayMicroseconds(200);
+      		digitalWrite(BEEP, LOW);
+      		delayMicroseconds(200);
+      		timer--;
+	  }
+return 0;
+}
+
+static int ping(TRIG, ECHO) {
 	long ping      = 0;
 	long pong      = 0;
 	float distance = 0;
@@ -37,6 +50,7 @@ static int ping()
 	// Cancel on timeout.
 	if (micros() > timeout) {
 		printf("Out of range.\n");
+		buzzer();
 		return 0;
 	}
 	
@@ -49,6 +63,7 @@ static int ping()
 	// Cancel on timeout.
 	if (micros() > timeout) {
 		printf("Out of range.\n");
+		buzzer();		
 		return 0;
 	}
 	
@@ -62,28 +77,24 @@ static int ping()
 	return 1;
 }
 
-int main (int argc, char *argv[])
-{
-	if (argc != 3) {
-		printf ("usage: %s <trigger> <echo>\n\nWhere:\n- trigger is the wiringPi trigger pin number.\n- echo is the wiringPi echo pin number.\nUsing trigger %d and echo %d.\n", argv[0], argv[1], argv[2]);
-	} else {
-		TRIG = atoi(argv[1]);
-		ECHO = atoi(argv[2]);
-	}
-	
+int main (int argc, char *argv[]) {
 	printf ("Raspberry Pi wiringPi HC-SR04 Sonar test program.\n");
 
 	if (wiringPiSetup () == -1) {
 		exit(EXIT_FAILURE);
-	}
+	        buzzer();
+        }
 		
 	if (setuid(getuid()) < 0) {
 		perror("Dropping privileges failed.\n");
+	        buzzer();
 		exit(EXIT_FAILURE);
 	}
 	
-	ping();
+	ping(TRIG_X, ECHO_X);
+	ping(TRIG_Y, ECHO_Y);
+	ping(TRIG_Z, ECHO_Z);
+	buzzer();
 	
 	return 0;
 }
-
